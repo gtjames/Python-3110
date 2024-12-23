@@ -1,59 +1,73 @@
+import sys
 import heapq
 
-def add_edge(routes, from_node, to_node, weight):
+def addEdge(routes, from_node, to_node, weight):
     if from_node not in routes:
         routes[from_node] = []
     routes[from_node][to_node] = weight
 
-def find_quickest_route(routes, start, end):
+def findQuickestRoute(routes, start, end):
     # Min-heap priority queue for Dijkstra's algorithm
-    priority_queue = [(0, start, [])]  # (current time, current airport, path)
+    priorityQueue = [(0, start, [])]  # (current time, current airport, path)
     visited = set()
 
-    while priority_queue:
-        current_time, current_airport, path = heapq.heappop(priority_queue)
+    while priorityQueue:
+        # Get the current shortest route
+        routeTime, currentAirport, path = heapq.heappop(priorityQueue)
 
-        # If we reach the destination
-        if current_airport == end:
-            return current_time, path + [current_airport]
+        # Have we reached the destination?
+        if currentAirport == end:
+            return routeTime, path + [currentAirport]
 
         # Skip if this node has already been visited
-        if current_airport in visited:
+        if currentAirport in visited:
             continue
-        path = path + [current_airport]
-        visited.add(current_airport)
+
+        # Note this airport as now visited
+        path = path + [currentAirport]
+        visited.add(currentAirport)
 
         # Explore neighbors
-        for neighbor, weight in routes.get(current_airport, {}).items():
-            if neighbor not in visited:
-                heapq.heappush(priority_queue, (current_time + weight, neighbor, path))
+        for neighbor, timeToDest in routes.get(currentAirport, {}).items():
+            print(f"{neighbor} - {timeToDest}")
+            if neighbor not in visited:                                
+                heapq.heappush(priorityQueue, (routeTime + timeToDest, neighbor, path))
+                print(f"    {priorityQueue}")
+
     return float('inf'), []  # If no route exists
 
 # Add airline paths (routes) with weights (distances or times)
+
+#   set this up for two routes for ATL to LAX
+#   ATL -> DFW -> DEN -> LAX    8 9 29      46
+#   ATL -> ORD -> PHX -> LAX    105 2 120   227
+#   ATL -> PHX -> LAX           168 120     288
 routes = {
-    "CZM": { "DFW": 273,  "STT": 118,  "AXA": 128,  "CDG": 269,  "LAS": 251,  "BRU": 87    },
-    "TUL": { "CDG": 209,  "LAS": 288,  "LGA": 257,  "BRU": 291  },
-    "CDG": { "SLC": 168,  "AXA": 217,  "DFW": 218,  "TUL": 83,   "LAS": 279  },
-    "BRU": { "LAS": 245,  "CDG": 123,  "SLC": 299,  "NYC": 193,  "LAX": 259,  "AMS": 110    },
-    "AMS": { "LGA": 193,  "BRU": 33,   "STT": 292,  "AUS": 137  },
-    "LAS": { "AUS": 168,  "AMS": 138,  "MIA": 161,  "NYC": 200,  "CZM": 152  },
-    "STT": { "AXA": 37,   "TUL": 113,  "AUS": 97,   "LGA": 101,  "AMS": 163  },
-    "AXA": { "NYC": 123,  "AUS": 75,   "BRU": 252,  "LGA": 226  },
-    "AUS": { "LAS": 149,  "MIA": 289,  "AMS": 263,  "CDG": 151  },
-    "LAX": { "CDG": 218,  "CZM": 47,   "SLC": 262,  "DFW": 296,  "AMS": 99, "TUL": 53    },
-    "DFW": { "BRU": 61,   "LAX": 130,  "SLC": 72,   "AXA": 259,  "CZM": 75, "MIA": 270   },
-    "SLC": { "NYC": 155,  "MIA": 49,   "CDG": 43,   "LAS": 267  },
-    "NYC": { "STT": 39,   "LGA": 179,  "SLC": 68,   "DFW": 151  },
-    "LGA": { "CZM": 222,  "AMS": 31,   "SLC": 244,  "AUS": 213,  "MIA": 181  },
-    "MIA": { "DFW": 150,  "AUS": 213,  "CDG": 220,  "BRU": 106,  "AXA": 260  }
-}
+    'ATL': {'DFW':   8, 'ORD': 105, 'PHX': 168},
+    'DFW': {'DEN':   9, 'ATL': 419, 'ORD': 120},
+    'DEN': {'LAX':  29, 'ORD': 243, 'ATL': 304},
+    'LAX': {'DFW': 100, 'ATL': 328},
+
+    'ORD': {'PHX':   2, 'DEN': 206, 'DFW': 255},
+    'PHX': {'LAX': 120},
+} 
 
 # Add airline paths (routes) with weights (distances or times)
-add_edge(routes, "SLC", "LAX", 5)
+# addEdge(routes, "SLC", "LAX", 5)
 
-start = "SLC"
-end = "LAX"
-time, route = find_quickest_route(routes, start, end)
+# Main program to handle command-line arguments
+if len(sys.argv) == 3:
+    start = sys.argv[1].upper()
+    end = sys.argv[2].upper()
+else:
+    start = input("Enter the start city: ").upper()
+    end = input("Enter the end city: ").upper()
+
+if start not in routes or end not in routes:
+    print("Error: Start or end city is not in the list of available cities.")
+    sys.exit(1)
+
+time, route = findQuickestRoute(routes, start, end)
 if route:
     print(f"Quickest route from {start} to {end} takes {time} hours: {' -> '.join(route)}")
 else:
