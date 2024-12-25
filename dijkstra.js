@@ -41,12 +41,13 @@ function dijkstra(graph, startNode) {
 
 // Example usage:
 const graph = {
-    A: { B: 6,  C: 2 },
-    B: { A: 4,  C: 1, D: 1 },
-    C: { A: 2,  F: 1, D: 8, E: 10 },
-    D: { B: 5,  C: 8, E: 2 },
-    E: { C: 10, D: 2 },
-    F: { B: 1,  D: 2 }
+    A: { B: 1,  D: 5,  E: 1 },
+    B: { C: 4,  D: 5 },
+    C: { F: 2,  D: 5 },
+    D: { G: 2 },
+    E: { D:  5, G: 1 },
+    G: { F: 1 },
+    F: { A: 6, D: 1.1 }
 };
 
 const startNode = "A";

@@ -1,17 +1,25 @@
 import heapq
+from collections import namedtuple
 
-def add_edge(routes, from_node, to_node, weight):
+def addEdge(routes, from_node, to_node, weight):
     if from_node not in routes:
         routes[from_node] = []
     routes[from_node].append({to_node: weight})
 
-def find_quickest_route(routes, start, end):
+def addPath(routes, to_node, path, time):
+    if to_node not in routes:
+        routes[to_node] = []
+    routes[to_node].append({time: time, path: path})
+
+def findQuickestRoute(routes, start, end):
     # Min-heap priority queue for Dijkstra's algorithm
     priority_queue = [(0, start, [])]  # (current time, current airport, path)
     visited = set()
-
+    paths = {}
+    
     while priority_queue:
         current_time, current_airport, path = heapq.heappop(priority_queue)
+        addPath(paths, current_airport, path, current_time)
 
         # If we reach the destination
         if current_airport == end:
@@ -32,29 +40,28 @@ def find_quickest_route(routes, start, end):
 
 # Add airline paths (routes) with weights (distances or times)
 routes = {
-    "CZM": [ {"DFW": 273},  {"STT": 118},    {"AXA": 128},   {"CDG": 269}, {"LAS": 251},  {"BRU": 87}],
-    "TUL": [ {"CDG": 209},  {"LAS": 288},    {"LGA": 257},   {"BRU": 291}, ],
-    "CDG": [ {"SLC": 168},  {"AXA": 217},    {"DFW": 218},   {"TUL": 83 }, {"LAS": 279}  ],
-    "BRU": [ {"LAS": 245},  {"CDG": 123},    {"SLC": 299},   {"NYC": 193}, {"LAX": 259},  {"AMS": 110}    ],
-    "AMS": [ {"LGA": 193},  {"BRU": 33 },    {"STT": 292},   {"AUS": 137}, ],
-    "LAS": [ {"AUS": 168},  {"AMS": 138},    {"MIA": 161},   {"NYC": 200}, {"CZM": 152}  ],
-    "STT": [ {"AXA": 37},   {"TUL": 113},    {"AUS": 97 },   {"LGA": 101}, {"AMS": 163}  ],
-    "AXA": [ {"NYC": 123},  {"AUS": 75 },    {"BRU": 252},   {"LGA": 226}, ],
-    "AUS": [ {"LAS": 149},  {"MIA": 289},    {"AMS": 263},   {"CDG": 151}, ],
-    "LAX": [ {"CDG": 218},  {"CZM": 47 },    {"SLC": 262},   {"DFW": 296}, {"AMS": 99}, {"TUL": 53}    ],
-    "DFW": [ {"BRU": 61},   {"LAX": 130},    {"SLC": 72 },   {"AXA": 259}, {"CZM": 75}, {"MIA": 270}   ],
-    "SLC": [ {"NYC": 155},  {"MIA": 49 },    {"CDG": 43 },   {"LAS": 267}, ],
-    "NYC": [ {"STT": 39},   {"LGA": 179},    {"SLC": 68 },   {"DFW": 151}, ],
-    "LGA": [ {"CZM": 222},  {"AMS": 31 },    {"SLC": 244},   {"AUS": 213}, {"MIA": 181}  ],
-    "MIA": [ {"DFW": 150},  {"AUS": 213},    {"CDG": 220},   {"BRU": 106}, {"AXA": 260}  ]
+    "TUL": [ {"CDG": 79},   {"LAS":  28},    {"LGA":  25},   {"BRU":  29}, ],
+    "CDG": [ {"SLC": 68},   {"AXA":  21},    {"DFW":  21},   {"TUL":  83}, {"LAS": 79}  ],
+    "BRU": [ {"LAS": 45},   {"CDG":  12},    {"SLC":  29},   {"NYC":  19}, {"LAX": 59},  {"AMS": 10}    ],
+    "AMS": [ {"LGA": 93},   {"BRU":  33},    {"STT":  29},   {"AUS":  13}, ],
+    "LAS": [ {"AUS": 68},   {"AMS":  13},    {"MIA":  16},   {"NYC":  20}, {"CZM": 52}  ],
+    "STT": [ {"AXA": 37},   {"TUL":  11},    {"AUS":  97},   {"LGA":  10}, {"AMS": 63}  ],
+    "AXA": [ {"NYC": 23},   {"AUS":  75},    {"BRU":  25},   {"LGA":  22}, ],
+    "AUS": [ {"LAS": 49},   {"MIA":  28},    {"AMS":  26},   {"CDG":  15}, ],
+    "LAX": [ {"CDG": 18},   {"CZM":  47},    {"SLC":  26},   {"DFW":  29}, {"AMS":  99}, {"TUL": 53}   ],
+    "DFW": [ {"BRU": 61},   {"LAX":  13},    {"SLC":  72},   {"AXA":  25}, {"CZM":  75}, {"MIA": 70}   ],
+    "SLC": [ {"NYC": 55},   {"MIA":  49},    {"CDG":  43},   {"LAS":  26}, ],
+    "NYC": [ {"STT": 39},   {"LGA":  17},    {"SLC":  68},   {"DFW":  15}, ],
+    "LGA": [ {"CZM": 22},   {"AMS":  31},    {"SLC":  24},   {"AUS":  21}, {"MIA": 81}  ],
+    "MIA": [ {"DFW": 50},   {"AUS":  21},    {"CDG":  22},   {"BRU":  10}, {"AXA": 60}  ]
 }
 
 # Add airline paths (routes) with weights (distances or times)
-add_edge(routes, "SLC", "LAX", 5)
+addEdge(routes, "SLC", "DFW", 5)
 
-start = "SLC"
-end = "LAX"
-time, route = find_quickest_route(routes, start, end)
+start = "TUL"
+end = "DFW"
+time, route = findQuickestRoute(routes, start, end)
 if route:
     print(f"Quickest route from {start} to {end} takes {time} hours: {' -> '.join(route)}")
 else:
